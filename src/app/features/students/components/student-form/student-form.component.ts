@@ -9,7 +9,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StudentService } from '../../services/student.service';
+import { ClassService } from '@features/classes/services/class.service';
 import { NotificationService } from '@core/services/notification.service';
+import { Observable } from 'rxjs';
+import { Class } from '@features/classes/models/class.model';
 
 @Component({
   selector: 'app-student-form',
@@ -21,6 +24,7 @@ import { NotificationService } from '@core/services/notification.service';
 export class StudentFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private studentService = inject(StudentService);
+  private classService = inject(ClassService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private notificationService = inject(NotificationService);
@@ -28,9 +32,11 @@ export class StudentFormComponent implements OnInit {
   studentForm!: FormGroup;
   isEditMode = false;
   studentId?: number;
+  classes$!: Observable<Class[]>;
 
   ngOnInit(): void {
     this.initForm();
+    this.classes$ = this.classService.getClasses();
     this.studentId = Number(this.route.snapshot.paramMap.get('id'));
     if (this.studentId) {
       this.isEditMode = true;
@@ -47,7 +53,6 @@ export class StudentFormComponent implements OnInit {
       email: ['', Validators.email],
       registrationDate: ['', Validators.required],
       status: ['ACTIVE', Validators.required],
-      annualTuitionAmount: [0],
       parentName: ['', Validators.required],
       parentPhone: ['', Validators.required],
       parentEmail: ['', Validators.email]
@@ -65,15 +70,34 @@ export class StudentFormComponent implements OnInit {
   onSubmit(): void {
     if (this.studentForm.valid) {
       const studentData = { ...this.studentForm.value };
+      
+      // Convertir la date en format ISO string
+      if (studentData.registrationDate instanceof Date) {
+        studentData.registrationDate = studentData.registrationDate.toISOString().split('T')[0];
+      }
 
       const request = this.isEditMode
         ? this.studentService.updateStudent(this.studentId!, studentData)
         : this.studentService.createStudent(studentData);
 
       request.subscribe({
-        next: () => {
-          this.notificationService.success(this.isEditMode ? 'Étudiant modifié' : 'Étudiant créé');
+        next: (student) => {
+          this.notificationService.success(
+            this.isEditMode 
+              ? 'Étudiant modifié' 
+              : `Étudiant créé avec le matricule: ${student.matricule}`
+          );
           this.router.navigate(['/students']);
+        },
+        error: (err) => {
+          if (err.error?.payload) {
+            const errors = Object.entries(err.error.payload)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(', ');
+            this.notificationService.error(`Erreur: ${errors}`);
+          } else {
+            this.notificationService.error('Une erreur est survenue');
+          }
         }
       });
     }

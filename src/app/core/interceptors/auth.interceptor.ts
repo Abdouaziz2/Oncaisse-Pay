@@ -5,13 +5,18 @@ import { AuthService } from '@features/auth/auth.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
+  const schoolId = localStorage.getItem('schoolId');
 
   if (token) {
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const headers: any = {
+      Authorization: `Bearer ${token}`
+    };
+    
+    if (schoolId) {
+      headers['X-School-Id'] = schoolId;
+    }
+    
+    req = req.clone({ setHeaders: headers });
   }
 
   return next(req);

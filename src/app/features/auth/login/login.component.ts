@@ -39,6 +39,18 @@ import { NotificationService } from '@core/services/notification.service';
               Se connecter
             </button>
           </form>
+
+          <div class="divider"><span>OU</span></div>
+
+          <button mat-stroked-button class="full-width oauth-btn google-btn" (click)="loginWithGoogle()">
+            <mat-icon>login</mat-icon>
+            Continuer avec Google
+          </button>
+
+          <button mat-stroked-button class="full-width oauth-btn github-btn" (click)="loginWithGithub()">
+            <mat-icon>code</mat-icon>
+            Continuer avec GitHub
+          </button>
         </mat-card-content>
       </mat-card>
     </div>
@@ -73,6 +85,29 @@ import { NotificationService } from '@core/services/notification.service';
       width: 100%;
       margin-bottom: 16px;
     }
+
+    .divider {
+      text-align: center;
+      margin: 24px 0;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .divider span { background: white; padding: 0 10px; color: #666; }
+
+    .oauth-btn { margin-bottom: 12px; }
+    .google-btn { border-color: #4285f4; color: #4285f4; }
+    .github-btn { border-color: #333; color: #333; }
   `]
 })
 export class LoginComponent {
@@ -95,5 +130,13 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  loginWithGoogle(): void {
+    window.location.href = 'http://localhost:2001/api-webServices/oauth2/authorization/google';
+  }
+
+  loginWithGithub(): void {
+    window.location.href = 'http://localhost:2001/api-webServices/oauth2/authorization/github';
   }
 }

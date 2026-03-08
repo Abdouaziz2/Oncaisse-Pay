@@ -6,6 +6,23 @@ export enum StudentStatus {
 }
 
 export enum Role {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  SCHOOL_ADMIN = 'SCHOOL_ADMIN',
   ADMIN = 'ADMIN',
-  CASHIER = 'CASHIER'
+  CASHIER = 'CASHIER',
+  STUDENT = 'STUDENT'
+}
+
+export enum PaymentStatus {
+  EN_ATTENTE = 'EN_ATTENTE',
+  PAYE = 'PAYE',
+  EN_RETARD = 'EN_RETARD',
+  ANNULE = 'ANNULE'
+}
+
+export enum PaymentMethod {
+  ORANGE_MONEY = 'ORANGE_MONEY',
+  WAVE = 'WAVE',
+  MOOV_MONEY = 'MOOV_MONEY',
+  CARTE_BANCAIRE = 'CARTE_BANCAIRE'
 }

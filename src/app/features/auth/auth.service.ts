@@ -24,9 +24,13 @@ export class AuthService {
         localStorage.setItem('access_token', jwtResponse.token);
         localStorage.setItem('username', jwtResponse.username);
         localStorage.setItem('role', jwtResponse.role);
+        if (jwtResponse.schoolId) {
+          localStorage.setItem('schoolId', jwtResponse.schoolId.toString());
+        }
         this.currentUserSubject.next({
           username: jwtResponse.username,
-          role: jwtResponse.role
+          role: jwtResponse.role,
+          schoolId: jwtResponse.schoolId
         });
       })
     );
@@ -36,6 +40,7 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('username');
     localStorage.removeItem('role');
+    localStorage.removeItem('schoolId');
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);
   }
@@ -47,6 +52,11 @@ export class AuthService {
   private getUserFromToken(): User | null {
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role') as any;
-    return username && role ? { username, role } : null;
+    const schoolId = localStorage.getItem('schoolId');
+    return username && role ? { 
+      username, 
+      role, 
+      schoolId: schoolId ? parseInt(schoolId) : undefined 
+    } : null;
   }
 }

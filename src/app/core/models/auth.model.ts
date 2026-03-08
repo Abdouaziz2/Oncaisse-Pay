@@ -10,9 +10,11 @@ export interface JwtResponse {
   type: string;
   username: string;
   role: Role;
+  schoolId?: number;
 }
 
 export interface User {
   username: string;
   role: Role;
+  schoolId?: number;
 }

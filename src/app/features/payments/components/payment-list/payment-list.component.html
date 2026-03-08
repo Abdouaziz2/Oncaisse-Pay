@@ -1,0 +1,99 @@
+<div class="payment-list-container">
+  <div class="header">
+    <h1>Gestion des Paiements</h1>
+    <button mat-raised-button color="primary" (click)="generatePayments()">
+      <mat-icon>add_circle</mat-icon>
+      Générer Paiements Mensuels
+    </button>
+  </div>
+
+  <div class="filters">
+    <form [formGroup]="filterForm">
+      <mat-form-field>
+        <mat-label>Statut</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">Tous</mat-option>
+          <mat-option *ngFor="let status of paymentStatuses" [value]="status">
+            {{ status }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Période</mat-label>
+        <input matInput formControlName="paymentPeriod" placeholder="Ex: 2024-01">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Matricule</mat-label>
+        <input matInput formControlName="studentMatricule" placeholder="Ex: STU2024001">
+      </mat-form-field>
+
+      <button mat-button (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Effacer
+      </button>
+    </form>
+  </div>
+
+  <table mat-table [dataSource]="payments" class="payments-table">
+    <ng-container matColumnDef="studentFullName">
+      <th mat-header-cell *matHeaderCellDef>Étudiant</th>
+      <td mat-cell *matCellDef="let payment">
+        <div class="student-info">
+          <strong>{{ payment.studentFullName }}</strong>
+          <small>{{ payment.studentClassName }}</small>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="amount">
+      <th mat-header-cell *matHeaderCellDef>Montant</th>
+      <td mat-cell *matCellDef="let payment">
+        <strong>{{ payment.amount | number:'1.0-0' }} FCFA</strong>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="paymentPeriod">
+      <th mat-header-cell *matHeaderCellDef>Période</th>
+      <td mat-cell *matCellDef="let payment">{{ payment.paymentPeriod }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="dueDate">
+      <th mat-header-cell *matHeaderCellDef>Date Limite</th>
+      <td mat-cell *matCellDef="let payment">{{ payment.dueDate | date:'dd/MM/yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Statut</th>
+      <td mat-cell *matCellDef="let payment">
+        <span [class]="'status-badge status-' + payment.status">
+          {{ payment.status }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="paymentDate">
+      <th mat-header-cell *matHeaderCellDef>Date Paiement</th>
+      <td mat-cell *matCellDef="let payment">
+        {{ payment.paymentDate ? (payment.paymentDate | date:'dd/MM/yyyy') : '-' }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let payment">
+        <button mat-icon-button (click)="viewPayment(payment.id!)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="pageIndex"
+    [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)">
+  </mat-paginator>
+</div>
